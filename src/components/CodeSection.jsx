@@ -6,40 +6,40 @@ function App() {
   const [user, setUser] = useState(null);
   const [theme, setTheme] = useState("light");
 
-  return (
-    <Layout user={user} theme={theme}>
-      <Sidebar user={user} theme={theme} />
-      <Main user={user} theme={theme}>
-        <Profile
-          user={user}
-          setUser={setUser}
-          theme={theme}
-        />
-      </Main>
-    </Layout>
-  );
+  return ( // [!code focus]
+    <Layout user={user} theme={theme}> // [!code focus]
+      <Sidebar user={user} theme={theme} /> // [!code focus]
+      <Main user={user} theme={theme}> // [!code focus]
+        <Profile // [!code focus]
+          user={user} // [!code focus]
+          setUser={setUser} // [!code focus]
+          theme={theme} // [!code focus]
+        /> // [!code focus]
+      </Main> // [!code focus]
+    </Layout> // [!code focus]
+  ); // [!code focus]
 }`;
 
 const afterCode = `// ✅ After — clean Context + custom hook
-const AppContext = createContext(null);
+const AppContext = createContext(null); // [!code focus]
 
-export function useApp() {
-  return useContext(AppContext);
-}
+export function useApp() { // [!code focus]
+  return useContext(AppContext); // [!code focus]
+} // [!code focus]
 
 function App() {
   const [user, setUser] = useState(null);
   const [theme, setTheme] = useState("dark");
 
   return (
-    <AppContext.Provider value={{ user, setUser, theme }}>
-      <Layout>
-        <Sidebar />
-        <Main>
-          <Profile />
-        </Main>
-      </Layout>
-    </AppContext.Provider>
+    <AppContext.Provider value={{ user, setUser, theme }}> // [!code focus]
+      <Layout> // [!code focus]
+        <Sidebar /> // [!code focus]
+        <Main> // [!code focus]
+          <Profile /> // [!code focus]
+        </Main> // [!code focus]
+      </Layout> // [!code focus]
+    </AppContext.Provider> // [!code focus]
   );
 }`;
 

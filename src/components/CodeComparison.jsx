@@ -12,10 +12,19 @@ export function CodeComparison({
   afterCode,
   language = 'jsx',
   filename = 'component.jsx',
-  highlightColor = '#7c3aed',
+  highlightColor = 'rgba(124, 58, 237, 0.25)',
 }) {
   const [highlightedBefore, setHighlightedBefore] = useState('');
   const [highlightedAfter, setHighlightedAfter] = useState('');
+  const [hasLeftFocus, setHasLeftFocus] = useState(false);
+  const [hasRightFocus, setHasRightFocus] = useState(false);
+
+  useEffect(() => {
+    if (highlightedBefore || highlightedAfter) {
+      setHasLeftFocus(highlightedBefore.includes('class="line focused"'));
+      setHasRightFocus(highlightedAfter.includes('class="line focused"'));
+    }
+  }, [highlightedBefore, highlightedAfter]);
 
   useEffect(() => {
     async function highlightCode() {
@@ -71,7 +80,7 @@ export function CodeComparison({
     <div className="code-comparison">
       <div className="code-comparison__grid">
         {/* Before */}
-        <div className="code-panel">
+        <div className={`code-panel${hasLeftFocus ? ' code-panel--has-focus' : ''}`}>
           <div className="code-panel__header">
             <FileIcon size={14} />
             <span className="code-panel__filename">{filename}</span>
@@ -81,7 +90,7 @@ export function CodeComparison({
         </div>
 
         {/* After */}
-        <div className="code-panel code-panel--right">
+        <div className={`code-panel code-panel--right${hasRightFocus ? ' code-panel--has-focus' : ''}`}>
           <div className="code-panel__header">
             <FileIcon size={14} />
             <span className="code-panel__filename">{filename}</span>

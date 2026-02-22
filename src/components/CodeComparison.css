@@ -58,19 +58,11 @@
   font-size: 0.75rem;
   color: #71717a;
   flex-shrink: 0;
+  transition: background 0.2s;
 }
 
-.code-panel__filename {
-  color: #a1a1aa;
-  font-weight: 500;
-}
-
-.code-panel__label {
-  margin-left: auto;
-  font-size: 0.7rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #52525b;
+.code-panel:hover .code-panel__header {
+  background: #1f1f23;
 }
 
 /* ── Panel Body (shiki output) ── */
@@ -104,23 +96,38 @@
   background: transparent !important;
 }
 
-.code-panel__body > pre > code > span {
+.code-panel__body > pre > code > .line {
   display: inline-block;
   width: 100%;
   padding: 0.1rem 1rem;
+  transition: opacity 0.3s ease, filter 0.3s ease;
 }
 
-/* diff: added / removed */
-.code-panel__body > pre > code > span.add {
-  background: rgba(16, 185, 129, 0.12);
+/* ── diff: added / removed ── */
+.code-panel__body > pre > code > .line.add {
+  background: rgba(16, 185, 129, 0.13);
 }
-.code-panel__body > pre > code > span.remove {
-  background: rgba(244, 63, 94, 0.12);
+.code-panel__body > pre > code > .line.remove {
+  background: rgba(244, 63, 94, 0.13);
 }
 
-/* highlight */
-.code-panel__body > pre > code > span.highlighted {
+/* ── highlight ── */
+.code-panel__body > pre > code > .line.highlighted {
   background: var(--highlight-color, rgba(124, 58, 237, 0.2));
+}
+
+/* ── Focus effect ──
+     When a panel has focused lines, blur the non-focused ones.
+     Hovering the panel restores full visibility.
+  ── */
+.code-panel--has-focus .code-panel__body > pre > code > .line:not(.focused) {
+  opacity: 0.35;
+  filter: blur(0.08rem);
+}
+
+.code-panel--has-focus:hover .code-panel__body > pre > code > .line:not(.focused) {
+  opacity: 1;
+  filter: none;
 }
 
 /* ── Responsive ── */
@@ -135,9 +142,6 @@
   }
 
   .code-comparison__vs {
-    top: auto;
-    bottom: 50%;
-    transform: translate(-50%, 0);
     display: none;
   }
 }
