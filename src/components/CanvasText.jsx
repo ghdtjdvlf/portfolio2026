@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { cn } from '../lib/utils';
 
 function resolveColor(color) {
   if (color.startsWith('var(')) {
@@ -14,7 +15,7 @@ function resolveColor(color) {
 export function CanvasText({
   text,
   className = '',
-  bgColor: bgColorProp = '#09090b',
+  bgColor = '#09090b',
   colors = ['#a78bfa', '#f472b6', '#60a5fa', '#34d399', '#fbbf24', '#818cf8'],
   animationDuration = 5,
   lineWidth = 1.5,
@@ -65,7 +66,7 @@ export function CanvasText({
       const elapsed = (currentTime - startTimeRef.current) / 1000;
       const phase = (elapsed / animationDuration) * Math.PI * 2;
 
-      ctx.fillStyle = bgColorProp;
+      ctx.fillStyle = bgColor;
       ctx.fillRect(0, 0, width, height);
 
       for (let i = 0; i < numLines; i++) {
@@ -93,31 +94,19 @@ export function CanvasText({
 
     animationRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animationRef.current);
-  }, [bgColorProp, resolvedColors, animationDuration, lineWidth, lineGap, curveIntensity]);
+  }, [bgColor, resolvedColors, animationDuration, lineWidth, lineGap, curveIntensity]);
 
   return (
-    <span style={{ position: 'relative', display: 'inline' }}>
+    <span className="relative inline">
       <canvas
         ref={canvasRef}
-        style={{
-          pointerEvents: 'none',
-          position: 'absolute',
-          height: 0,
-          width: 0,
-          opacity: 0,
-        }}
+        className="pointer-events-none absolute h-0 w-0 opacity-0"
         aria-hidden="true"
       />
       <span
         ref={textRef}
-        className={className}
-        style={{
-          WebkitBackgroundClip: 'text',
-          backgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          color: 'transparent',
-          display: 'inline',
-        }}
+        className={cn('bg-clip-text text-transparent inline', className)}
+        style={{ WebkitBackgroundClip: 'text' }}
       >
         {text}
       </span>

@@ -1,5 +1,4 @@
 import { CodeComparison } from './CodeComparison';
-import './CodeSection.css';
 
 const beforeCode = `// ❌ Before — prop drilling nightmare
 function App() {
@@ -45,17 +44,26 @@ function App() {
 
 const CodeSection = () => {
   return (
-    <section className="code-section" id="code">
-      <div className="code-section__inner">
+    <section
+      id="code"
+      className="relative w-full min-h-screen bg-background flex items-center justify-center py-32 px-6
+                 before:absolute before:top-0 before:left-[10%] before:w-4/5 before:h-px
+                 before:bg-gradient-to-r before:from-transparent before:via-white/[0.06] before:to-transparent"
+    >
+      <div className="max-w-[900px] w-full flex flex-col gap-8">
 
-        <p className="code-section__label">Code Philosophy</p>
+        <p className="text-xs font-semibold tracking-[0.25em] uppercase text-zinc-600">
+          Code Philosophy
+        </p>
 
-        <h2 className="code-section__headline">
+        <h2 className="text-[clamp(2.4rem,6vw,5rem)] font-extrabold leading-[1.1] tracking-tight text-zinc-50 m-0">
           Writing code that<br />
-          <span className="code-section__headline--accent">speaks for itself</span>
+          <span className="bg-gradient-to-r from-violet-400 to-blue-400 bg-clip-text text-transparent">
+            speaks for itself
+          </span>
         </h2>
 
-        <p className="code-section__desc">
+        <p className="text-base leading-7 text-zinc-600 mb-2">
           Clean architecture over clever tricks. Every refactor tells a story.
         </p>
 
@@ -64,7 +72,7 @@ const CodeSection = () => {
           afterCode={afterCode}
           language="jsx"
           filename="App.jsx"
-          highlightColor="rgba(124, 58, 237, 0.25)"
+          highlightColor="#7c3aed"
         />
 
       </div>
