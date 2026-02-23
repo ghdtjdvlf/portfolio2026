@@ -1,61 +1,40 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useEffect, useMemo, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 
-export function AnimatedListItem({ children }) {
-  return (
-    <motion.div
-      layout
-      initial={{ scale: 0, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1, originY: 0 }}
-      exit={{ scale: 0, opacity: 0 }}
-      transition={{ type: 'spring', stiffness: 350, damping: 40 }}
-      className="mx-auto w-full"
-    >
-      {children}
-    </motion.div>
-  );
-}
-
-export const AnimatedList = React.memo(({ children, className = '', delay = 1200, active = true }) => {
-  const [index, setIndex] = useState(0);
-  const childrenArray = useMemo(() => React.Children.toArray(children), [children]);
-  const prevActiveRef = useRef(active);
+export function AnimatedList({ children, delay = 1000, active = true, className }) {
+  const items = Array.isArray(children) ? children : [children];
+  const [visibleCount, setVisibleCount] = useState(0);
 
   useEffect(() => {
     if (!active) return;
-    if (index < childrenArray.length - 1) {
-      const timeout = setTimeout(() => {
-        setIndex((prev) => prev + 1);
-      }, delay);
-      return () => clearTimeout(timeout);
-    }
-  }, [index, delay, childrenArray.length, active]);
 
-  useEffect(() => {
-    // Check if active just changed from false to true
-    if (!prevActiveRef.current && active) {
-       
-      setIndex(0);
-    }
-    prevActiveRef.current = active; // Update ref for next render
-  }, [active]);
+    setVisibleCount(0);
+    let current = 0;
 
-  const itemsToShow = useMemo(
-    () => childrenArray.slice(0, index + 1).reverse(),
-    [index, childrenArray],
-  );
+    const interval = setInterval(() => {
+      current += 1;
+      setVisibleCount(current);
+      if (current >= items.length) clearInterval(interval);
+    }, delay);
+
+    return () => clearInterval(interval);
+  }, [active, delay, items.length]);
 
   return (
-    <div className={`flex flex-col items-center gap-3 ${className}`}>
+    <div className={className}>
       <AnimatePresence>
-        {itemsToShow.map((item) => (
-          <AnimatedListItem key={item.key}>
+        {items.slice(0, visibleCount).map((item, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 20, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
+            className="mb-3"
+          >
             {item}
-          </AnimatedListItem>
+          </motion.div>
         ))}
       </AnimatePresence>
     </div>
   );
-});
-
-AnimatedList.displayName = 'AnimatedList';
+}
