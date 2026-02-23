@@ -7,12 +7,27 @@ import ProgramSection from './components/ProgramSection';
 import ReviewSection from './components/ReviewSection';
 import FaqSection from './components/FaqSection';
 import ContactSection from './components/ContactSection';
-import { trackPageView, trackSession } from './lib/analytics';
+import ResumeToast from './components/ResumeToast';
+import { trackPageView, trackSession, trackVisitor } from './lib/analytics';
 import './App.css';
 
 function App() {
   useEffect(() => {
     trackPageView();
+
+    // 세션당 1회만 위치 수집
+    if (!sessionStorage.getItem('loc_tracked')) {
+      fetch('https://ipwho.is/')
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.success) {
+            trackVisitor(data);
+            sessionStorage.setItem('loc_tracked', '1');
+          }
+        })
+        .catch(() => {});
+    }
+
     const start = Date.now();
     const onUnload = () => {
       const sec = Math.round((Date.now() - start) / 1000);
@@ -34,6 +49,7 @@ function App() {
     <main className="lg:pb-0 pb-24">
       <ResizableNavbar navItems={navItems} logo={logo} />
       <MobileDock />
+      <ResumeToast />
 
       <section id="hero">
         <HeroSection />

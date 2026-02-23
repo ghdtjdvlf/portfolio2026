@@ -95,16 +95,31 @@ const ContactSection = () => {
     sessionStorage.setItem('form_progress', JSON.stringify({ step, answers }));
   }, [step, answers]);
 
-  // 페이지 이탈 시 미제출 상태면 중도 포기로 기록
+  // 페이지 이탈 알럿 + 중도 포기 기록
   useEffect(() => {
-    const handleUnload = () => {
+    const handleUnload = (e) => {
       const raw = sessionStorage.getItem('form_progress');
       if (!raw) return;
       const { step: s, answers: a } = JSON.parse(raw);
-      if (s > 0) trackAbandonedAnswers(a, s);
+      if (s > 0) {
+        trackAbandonedAnswers(a, s);
+        // 브라우저 기본 이탈 확인 다이얼로그 표시
+        e.preventDefault();
+        e.returnValue = '';
+      }
     };
     window.addEventListener('beforeunload', handleUnload);
     return () => window.removeEventListener('beforeunload', handleUnload);
+  }, []);
+
+  // 이어서 작성 이벤트 수신 (ResumeToast에서 발송)
+  useEffect(() => {
+    const handleResume = (e) => {
+      setStep(e.detail.step);
+      setAnswers(e.detail.answers);
+    };
+    window.addEventListener('resume-form', handleResume);
+    return () => window.removeEventListener('resume-form', handleResume);
   }, []);
 
   const current = STEPS[step];

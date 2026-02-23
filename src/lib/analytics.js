@@ -1,6 +1,5 @@
 const KEY = 'pf_analytics';
 
-// 분석할 라디오 필드만 (텍스트/개인정보 제외)
 const RADIO_FIELDS = ['age', 'gender', 'body', 'job', 'reason'];
 
 function load() {
@@ -47,7 +46,6 @@ export function trackFormSubmit() {
   save(d);
 }
 
-// 최종 제출 완료 → 각 라디오 답변 누적
 export function trackCompletedAnswers(answers) {
   const d = load();
   if (!d.completedAnswers) d.completedAnswers = {};
@@ -55,13 +53,33 @@ export function trackCompletedAnswers(answers) {
   save(d);
 }
 
-// 중도 포기 → 답변 + 이탈 스텝 누적
 export function trackAbandonedAnswers(answers, lastStep) {
   const d = load();
   if (!d.abandonedAnswers) d.abandonedAnswers = {};
   if (!d.abandonedAtStep) d.abandonedAtStep = {};
+  if (!d.abandonedTimes) d.abandonedTimes = [];
+
   d.abandonedAtStep[`s${lastStep}`] = (d.abandonedAtStep[`s${lastStep}`] || 0) + 1;
   accumulateAnswers(d.abandonedAnswers, answers);
+
+  // 이탈 시각 + 스텝 기록 (시간대 분석용)
+  d.abandonedTimes.push({ time: Date.now(), step: lastStep });
+  if (d.abandonedTimes.length > 500) d.abandonedTimes = d.abandonedTimes.slice(-500);
+
+  save(d);
+}
+
+// 방문자 위치 기록
+export function trackVisitor(loc) {
+  const d = load();
+  if (!d.visitors) d.visitors = [];
+  d.visitors.push({
+    time: Date.now(),
+    country: loc.country_code || '',
+    region: loc.region || '',   // 시·도
+    city: loc.city || '',       // 시·군·구
+  });
+  if (d.visitors.length > 500) d.visitors = d.visitors.slice(-500);
   save(d);
 }
 

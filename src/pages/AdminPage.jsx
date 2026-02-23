@@ -109,6 +109,166 @@ function FunnelBar({ label, count, max, isSubmit }) {
   );
 }
 
+/* ── 방문자 위치 ── */
+function VisitorLocations({ visitors }) {
+  if (!visitors.length) return null;
+
+  // 지역별 방문 횟수 집계
+  const freq = {};
+  visitors.forEach(({ region, city, country }) => {
+    if (country !== 'KR') return; // 한국 외 제외하지 않으려면 이 줄 삭제
+    const key = city && city !== region ? `${region} ${city}` : region || city || '알 수 없음';
+    freq[key] = (freq[key] || 0) + 1;
+  });
+
+  const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]);
+  const maxCount = sorted[0]?.[1] || 1;
+  const recent = [...visitors].reverse().slice(0, 10);
+
+  return (
+    <div className="flex flex-col gap-4">
+      {/* 지역별 방문 빈도 */}
+      <div className="rounded-2xl p-6 flex flex-col gap-4"
+        style={{ background: '#1C1C1E', border: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className="flex items-center justify-between">
+          <p className="text-sm font-bold text-zinc-200">방문자 지역</p>
+          <span className="text-xs text-zinc-600">총 {visitors.length}건 수집</span>
+        </div>
+        {sorted.length === 0 ? (
+          <p className="text-xs text-zinc-600">데이터 없음</p>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {sorted.slice(0, 8).map(([loc, count]) => (
+              <div key={loc} className="flex items-center gap-3">
+                <span className="text-xs text-zinc-400 w-32 shrink-0 truncate">{loc}</span>
+                <div className="flex-1 h-5 rounded-lg overflow-hidden"
+                  style={{ background: 'rgba(255,255,255,0.05)' }}>
+                  <div
+                    className="h-full rounded-lg flex items-center px-2 transition-all duration-700"
+                    style={{
+                      width: `${(count / maxCount) * 100}%`,
+                      minWidth: 24,
+                      background: 'linear-gradient(90deg,#6366f1,#a78bfa)',
+                    }}
+                  >
+                    <span className="text-[10px] text-white font-bold">{count}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* 최근 방문 로그 */}
+      <div className="rounded-2xl p-6 flex flex-col gap-3"
+        style={{ background: '#1C1C1E', border: '1px solid rgba(255,255,255,0.08)' }}>
+        <p className="text-sm font-bold text-zinc-200 mb-1">최근 방문 위치</p>
+        {recent.map((v, i) => {
+          const loc = v.city && v.city !== v.region
+            ? `${v.region} ${v.city}`
+            : v.region || v.city || '알 수 없음';
+          return (
+            <div key={i} className="flex items-center justify-between py-1.5"
+              style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+              <div className="flex items-center gap-2">
+                <span className="text-base">{v.country === 'KR' ? '🇰🇷' : '🌐'}</span>
+                <span className="text-sm text-zinc-300">{loc}</span>
+              </div>
+              <span className="text-xs text-zinc-600">{formatTime(v.time)}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* ── 시간대/요일 분석 차트 ── */
+const DAYS = ['일', '월', '화', '수', '목', '금', '토'];
+
+function AbandonTimeChart({ times }) {
+  if (!times.length) return null;
+
+  const byHour = Array(24).fill(0);
+  const byDay  = Array(7).fill(0);
+  times.forEach(({ time }) => {
+    const d = new Date(time);
+    byHour[d.getHours()]++;
+    byDay[d.getDay()]++;
+  });
+
+  const maxH = Math.max(...byHour, 1);
+  const maxD = Math.max(...byDay, 1);
+
+  // 가장 많이 이탈한 시간대
+  const peakHour = byHour.indexOf(Math.max(...byHour));
+  const peakDay  = DAYS[byDay.indexOf(Math.max(...byDay))];
+
+  return (
+    <div className="rounded-2xl p-6 flex flex-col gap-6"
+      style={{ background: '#1C1C1E', border: '1px solid rgba(255,255,255,0.08)' }}>
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-bold text-zinc-200">이탈 시간 분석</p>
+        <div className="flex gap-3 text-xs text-zinc-500">
+          <span>최다 이탈 <span className="text-zinc-300 font-semibold">{peakHour}시</span></span>
+          <span>최다 요일 <span className="text-zinc-300 font-semibold">{peakDay}요일</span></span>
+        </div>
+      </div>
+
+      {/* 시간대별 (0~23시) */}
+      <div className="flex flex-col gap-1.5">
+        <p className="text-xs text-zinc-600 mb-1">시간대별 이탈</p>
+        <div className="flex items-end gap-[3px] h-16">
+          {byHour.map((count, h) => (
+            <div key={h} className="flex-1 flex flex-col items-center justify-end gap-1">
+              <div
+                className="w-full rounded-sm transition-all duration-700"
+                style={{
+                  height: `${(count / maxH) * 100}%`,
+                  minHeight: count > 0 ? 3 : 0,
+                  background: count === Math.max(...byHour)
+                    ? 'linear-gradient(180deg,#f87171,#fb923c)'
+                    : 'rgba(255,255,255,0.15)',
+                }}
+              />
+            </div>
+          ))}
+        </div>
+        <div className="flex justify-between text-[9px] text-zinc-700 mt-0.5 px-0.5">
+          <span>0시</span><span>6시</span><span>12시</span><span>18시</span><span>23시</span>
+        </div>
+      </div>
+
+      {/* 요일별 */}
+      <div className="flex flex-col gap-2">
+        <p className="text-xs text-zinc-600 mb-1">요일별 이탈</p>
+        {DAYS.map((day, i) => (
+          <div key={day} className="flex items-center gap-3">
+            <span className="text-xs text-zinc-500 w-6 shrink-0 text-right">{day}</span>
+            <div className="flex-1 h-5 rounded-lg overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>
+              <div
+                className="h-full rounded-lg flex items-center px-2 transition-all duration-700"
+                style={{
+                  width: `${(byDay[i] / maxD) * 100}%`,
+                  minWidth: byDay[i] > 0 ? 24 : 0,
+                  background: byDay[i] === Math.max(...byDay)
+                    ? 'linear-gradient(90deg,#f87171,#fb923c)'
+                    : 'rgba(255,255,255,0.18)',
+                }}
+              >
+                {byDay[i] > 0 && (
+                  <span className="text-[10px] text-white font-bold">{byDay[i]}</span>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ── 탭 ── */
 function Tab({ label, active, onClick }) {
   return (
@@ -299,7 +459,7 @@ function Dashboard() {
               style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
               <span className="text-2xl">❌</span>
               <div>
-                <p className="text-sm font-bold text-zinc-200">중도 포기한 {abandonedCount}명의 답변 분포</p>
+                <p className="text-sm font-bold text-zinc-200">중도 포기한 {abandonedCount}명의 분석</p>
                 <p className="text-xs text-zinc-500 mt-0.5">탭/창 닫기 시점을 기준으로 기록됩니다</p>
               </div>
             </div>
@@ -319,6 +479,10 @@ function Dashboard() {
               </div>
             )}
 
+            {/* 시간대 분석 */}
+            <AbandonTimeChart times={data.abandonedTimes || []} />
+
+            {/* 답변 분포 */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {RADIO_QUESTIONS.map((q) => (
                 <AnswerDistCard
@@ -331,6 +495,9 @@ function Dashboard() {
             </div>
           </>
         )}
+
+        {/* ── 방문자 위치 (개요 탭에만) ── */}
+        {tab === 'overview' && <VisitorLocations visitors={data.visitors || []} />}
 
         <p className="text-center text-xs text-zinc-700">
           localStorage 저장 · 5초 자동 갱신
