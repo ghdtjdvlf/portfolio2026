@@ -14,9 +14,6 @@ function App() {
       <section id="hero">
         <HeroSection />
       </section>
-      <div style={{ height: '600px', background: '#09090b' }}>
-        <CircularGallery bend={3} textColor="#ffffff" borderRadius={0.05} />
-      </div>
       <div>
         <ProgramSection />
       </div>

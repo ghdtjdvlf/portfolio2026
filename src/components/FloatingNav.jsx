@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 
 const NAV_ITEMS = [
   { label: '소개', href: '#hero' },
   { label: '1부', href: '#part1' },
   { label: '2부', href: '#part2' },
-  { label: '리뷰', href: '#reviews' },
+  { label: '후기', href: '#reviews' },
   { label: '참가신청', href: '#contact' },
 ];
 
@@ -18,10 +18,13 @@ const navStyle = {
 
 export default function FloatingNav() {
   const [active, setActive] = useState('#hero');
+  const scrollTimeout = useRef(null);
 
   // 현재 섹션 감지
   useEffect(() => {
     const handleScroll = () => {
+      if (scrollTimeout.current) return; // Don't run if we're in a click-initiated scroll
+
       const y = window.scrollY + 160;
       let current = NAV_ITEMS[0].href;
       for (const item of NAV_ITEMS) {
@@ -30,14 +33,43 @@ export default function FloatingNav() {
       }
       setActive(current);
     };
+
+    // If user scrolls manually, clear the timeout to re-enable scroll detection
+    const handleManualScroll = () => {
+      if (scrollTimeout.current) {
+        clearTimeout(scrollTimeout.current);
+        scrollTimeout.current = null;
+      }
+    };
+
     window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('wheel', handleManualScroll);
+    window.addEventListener('touchstart', handleManualScroll);
     handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('wheel', handleManualScroll);
+      window.removeEventListener('touchstart', handleManualScroll);
+      if (scrollTimeout.current) {
+        clearTimeout(scrollTimeout.current);
+      }
+    };
   }, []);
 
   const handleClick = (e, href) => {
     e.preventDefault();
+    setActive(href);
+
+    if (scrollTimeout.current) {
+      clearTimeout(scrollTimeout.current);
+    }
+
     document.getElementById(href.slice(1))?.scrollIntoView({ behavior: 'smooth' });
+
+    scrollTimeout.current = setTimeout(() => {
+      scrollTimeout.current = null;
+    }, 1000); // Timeout to temporarily disable scroll handler
   };
 
   const renderItems = (layoutId) =>

@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 
 export function AnimatedListItem({ children }) {
   return (
@@ -19,6 +19,7 @@ export function AnimatedListItem({ children }) {
 export const AnimatedList = React.memo(({ children, className = '', delay = 1200, active = true }) => {
   const [index, setIndex] = useState(0);
   const childrenArray = useMemo(() => React.Children.toArray(children), [children]);
+  const prevActiveRef = useRef(active);
 
   useEffect(() => {
     if (!active) return;
@@ -30,9 +31,13 @@ export const AnimatedList = React.memo(({ children, className = '', delay = 1200
     }
   }, [index, delay, childrenArray.length, active]);
 
-  // active가 false → false→true로 바뀔 때 index 리셋
   useEffect(() => {
-    if (active) setIndex(0);
+    // Check if active just changed from false to true
+    if (!prevActiveRef.current && active) {
+       
+      setIndex(0);
+    }
+    prevActiveRef.current = active; // Update ref for next render
   }, [active]);
 
   const itemsToShow = useMemo(

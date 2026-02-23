@@ -13,24 +13,28 @@ export default function PartBridge({ id, part, subtitle, subtitleKo, desc, color
     const ctx = gsap.context(() => {
       const split = new SplitText(descRef.current, { type: 'words', wordsClass: 'word' });
 
-      gsap.set(split.words, { opacity: 0.15 });
+      // Set the initial state of the words to gray and semi-transparent
+      gsap.set(split.words, { color: '#808080', opacity: 0.5 });
 
       gsap.timeline({
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: 'top top',
+          start: 'top top', // Pins when the top of the trigger hits the top of the viewport
           end: '+=150%',
           pin: true,
           scrub: true,
         },
-      }).to(split.words, {
-        opacity: 1,
+      })
+      .to({}, { duration: 0.5 }) // Delay the start of the color change animation by 50% of the scroll duration
+      .to(split.words, {
+        color: color,    // Animate to the final color from the prop
+        opacity: 1,      // Animate to full opacity
         stagger: 0.1,
       });
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [color]);
 
   return (
     <section
