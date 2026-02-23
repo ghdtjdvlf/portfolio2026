@@ -2,7 +2,7 @@ const HeroSection = () => {
   return (
     <section className="w-full h-screen bg-black flex items-center justify-center overflow-hidden">
       {/* 2.35:1 시네마 비율 컨테이너 */}
-      <div className="relative w-full aspect-[4/3] md:aspect-[235/100]">
+      <div className="relative w-full aspect-[9/16] md:aspect-[235/100]">
         {/* 배경 비디오 */}
         <video
           className="absolute inset-0 w-full h-full object-cover"

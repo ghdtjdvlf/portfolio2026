@@ -47,7 +47,7 @@ const PlusIcon = () => (
 );
 
 const MinusIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#7CB9E8" className="size-6 shrink-0">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#147EFB" className="size-6 shrink-0">
     <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z" clipRule="evenodd" />
   </svg>
 );
@@ -56,7 +56,7 @@ const FaqSection = () => {
   const [openItem, setOpenItem] = useState(null);
 
   return (
-    <section className="w-full flex flex-col items-center justify-center px-4 py-20 md:px-8 md:py-28">
+    <section className="w-full flex flex-col items-center justify-center px-4 py-20 md:px-8 md:py-28" style={{ background: '#09090b' }}>
       <div className="w-full max-w-[700px] flex flex-col gap-8">
 
         {/* Header */}
@@ -66,8 +66,8 @@ const FaqSection = () => {
         </div>
 
         {/* Accordion */}
-        <div className="rounded-2xl bg-white p-4 md:p-6">
-          <p className="mb-5 text-base text-gray-400">오늘, 오전 9:01</p>
+        <div className="rounded-2xl p-4 md:p-6" style={{ background: '#1C1C1E', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <p className="mb-5 text-base text-zinc-600">오늘, 오전 9:01</p>
 
           <Accordion.Root
             type="single"
@@ -83,7 +83,7 @@ const FaqSection = () => {
                     <Accordion.Trigger className="flex w-full items-center justify-start gap-x-4">
                       <div
                         className="relative flex items-center space-x-2 rounded-xl px-4 py-3 transition-colors duration-200 flex-1"
-                        style={{ backgroundColor: isOpen ? '#E0F7FA' : '#f3f4f6' }}
+                        style={{ backgroundColor: isOpen ? '#2C2C2E' : '#3A3A3C' }}
                       >
                         {item.icon && (
                           <span
@@ -93,11 +93,11 @@ const FaqSection = () => {
                             {item.icon}
                           </span>
                         )}
-                        <span className="font-semibold text-gray-800 text-left text-base md:text-lg">
+                        <span className="font-semibold text-zinc-100 text-left text-base md:text-lg">
                           {item.question}
                         </span>
                       </div>
-                      <span className="cursor-pointer text-gray-400 shrink-0">
+                      <span className="cursor-pointer text-zinc-600 shrink-0">
                         {isOpen ? <MinusIcon /> : <PlusIcon />}
                       </span>
                     </Accordion.Trigger>
@@ -115,9 +115,9 @@ const FaqSection = () => {
                       style={{ overflow: 'hidden' }}
                     >
                       <div className="ml-4 mt-2 pb-3 md:ml-8">
-                        <div className="relative inline-block rounded-2xl bg-blue-500 px-4 py-3 text-base text-white" style={{ maxWidth: '85%' }}>
+                        <div className="relative inline-block rounded-2xl px-4 py-3 text-base text-white" style={{ background: '#147EFB', maxWidth: '85%' }}>
                           {item.answer}
-                          <div className="absolute bottom-0 right-0 h-0 w-0 border-l-[10px] border-t-[10px] border-l-transparent border-t-blue-500" />
+                          <div className="absolute bottom-0 right-0 h-0 w-0 border-l-[10px] border-t-[10px] border-l-transparent border-t-[#147EFB]" />
                         </div>
                       </div>
                     </motion.div>

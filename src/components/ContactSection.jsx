@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { trackFormStep, trackFormSubmit, trackCompletedAnswers, trackAbandonedAnswers } from '../lib/analytics';
 
 const FORMSPREE_URL = 'https://formspree.io/f/mkozwrwj';
 
@@ -83,6 +84,29 @@ const ContactSection = () => {
   const [answers, setAnswers] = useState({});
   const [status, setStatus] = useState('idle');
 
+  // 새 스텝 첫 도달 시에만 기록 (뒤로가기 제외)
+  useEffect(() => {
+    const prev = parseInt(sessionStorage.getItem('form_max_step') ?? '-1');
+    if (step > prev) {
+      sessionStorage.setItem('form_max_step', String(step));
+      trackFormStep(step);
+    }
+    // 현재 진행 상태를 sessionStorage에 저장 (이탈 감지용)
+    sessionStorage.setItem('form_progress', JSON.stringify({ step, answers }));
+  }, [step, answers]);
+
+  // 페이지 이탈 시 미제출 상태면 중도 포기로 기록
+  useEffect(() => {
+    const handleUnload = () => {
+      const raw = sessionStorage.getItem('form_progress');
+      if (!raw) return;
+      const { step: s, answers: a } = JSON.parse(raw);
+      if (s > 0) trackAbandonedAnswers(a, s);
+    };
+    window.addEventListener('beforeunload', handleUnload);
+    return () => window.removeEventListener('beforeunload', handleUnload);
+  }, []);
+
   const current = STEPS[step];
   const total = STEPS.length;
   const progress = (step / total) * 100;
@@ -120,6 +144,12 @@ const ContactSection = () => {
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify(payload),
       });
+      if (res.ok) {
+        trackFormSubmit();
+        trackCompletedAnswers(answers);
+        sessionStorage.removeItem('form_max_step');
+        sessionStorage.removeItem('form_progress');
+      }
       setStatus(res.ok ? 'success' : 'error');
     } catch {
       setStatus('error');

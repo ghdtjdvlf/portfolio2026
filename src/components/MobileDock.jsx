@@ -1,17 +1,16 @@
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { Home, Star, Heart, HelpCircle, MessageSquare } from 'lucide-react';
+import { Sparkles, LayoutGrid, Star, Send } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { scrollToSection } from '../lib/lenis';
 
 const NAV_ITEMS = [
-  { name: '메인',  link: '#hero',    Icon: Home },
-  { name: '1부',   link: '#part1',   Icon: Star },
-  { name: '2부',   link: '#part2',   Icon: Heart },
-  { name: '후기',  link: '#faq',     Icon: HelpCircle },
-  { name: '리뷰',  link: '#reviews', Icon: MessageSquare },
+  { name: '소개',    link: '#intro',    Icon: Sparkles },
+  { name: '컨텐츠', link: '#program',  Icon: LayoutGrid },
+  { name: '후기',   link: '#reviews',  Icon: Star },
+  { name: '신청',   link: '#contact',  Icon: Send },
 ];
 
-const SECTION_IDS = NAV_ITEMS.map((item) => item.link.slice(1)); // ['hero','part1',...]
+const SECTION_IDS = NAV_ITEMS.map((item) => item.link.slice(1));
 
 const SCALE_MAX  = 1.5;
 const DISTANCE   = 80;
@@ -25,13 +24,10 @@ function useActiveSection() {
     const update = () => {
       const threshold = window.innerHeight * 0.45;
       let best = SECTION_IDS[0];
-
       for (const id of SECTION_IDS) {
         const el = document.getElementById(id);
         if (!el) continue;
-        if (el.getBoundingClientRect().top <= threshold) {
-          best = id;
-        }
+        if (el.getBoundingClientRect().top <= threshold) best = id;
       }
       setActive(best);
     };
@@ -59,30 +55,19 @@ function DockItem({ item, mouseX, isActive }) {
   const scale = useTransform(distance, [0, DISTANCE, DISTANCE + 1], [SCALE_MAX, 1, 1]);
   const scaleSpring = useSpring(scale, SPRING_CFG);
 
-  const handleClick = (e) => {
-    e.preventDefault();
-    scrollToSection(item.link);
-  };
-
   return (
     <motion.a
       ref={ref}
       href={item.link}
-      onClick={handleClick}
+      onClick={(e) => { e.preventDefault(); scrollToSection(item.link); }}
       style={{ scale: scaleSpring, transformOrigin: 'bottom center' }}
       className="flex flex-col items-center gap-1 cursor-pointer select-none"
     >
       <motion.div
         animate={{
-          background: isActive
-            ? 'rgba(255,255,255,0.95)'
-            : 'rgba(255,255,255,0.08)',
-          borderColor: isActive
-            ? 'rgba(255,255,255,0.9)'
-            : 'rgba(255,255,255,0.15)',
-          boxShadow: isActive
-            ? '0 0 14px rgba(255,255,255,0.25)'
-            : '0 0 0px rgba(255,255,255,0)',
+          background: isActive ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.08)',
+          borderColor: isActive ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.15)',
+          boxShadow: isActive ? '0 0 14px rgba(255,255,255,0.25)' : '0 0 0px rgba(255,255,255,0)',
         }}
         transition={{ duration: 0.25 }}
         className="w-12 h-12 rounded-2xl border flex items-center justify-center"
@@ -102,13 +87,6 @@ function DockItem({ item, mouseX, isActive }) {
       >
         {item.name}
       </motion.span>
-
-      {/* 활성 인디케이터 점 */}
-      <motion.div
-        animate={{ opacity: isActive ? 1 : 0, scale: isActive ? 1 : 0 }}
-        transition={{ duration: 0.2 }}
-        className="w-1 h-1 rounded-full bg-white"
-      />
     </motion.a>
   );
 }

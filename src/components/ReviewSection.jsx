@@ -161,7 +161,7 @@ const AVG_RATING = (REVIEWS.reduce((s, r) => s + r.rating, 0) / REVIEWS.length).
 
 export default function ReviewSection() {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: '-120px' });
+  const isInView = useInView(ref, { once: false, margin: '0px' });
 
   return (
     <section style={{ background: '#09090b' }} className="w-full px-5 py-20 md:py-28">
@@ -188,7 +188,7 @@ export default function ReviewSection() {
 
         {/* 뷰포트 감지용 트리거 */}
         <div ref={ref}>
-          <AnimatedList delay={2000} active={isInView}>
+          <AnimatedList delay={1500} active={isInView}>
             {REVIEWS.map((review, i) => (
               <ReviewCard key={i} {...review} />
             ))}

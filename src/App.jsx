@@ -1,20 +1,31 @@
+import { useEffect } from 'react';
 import ResizableNavbar from './components/ResizableNavbar';
 import MobileDock from './components/MobileDock';
 import HeroSection from './components/HeroSection';
-import CircularGallery from './components/CircularGallery';
+import IntroSection from './components/IntroSection';
 import ProgramSection from './components/ProgramSection';
 import ReviewSection from './components/ReviewSection';
 import FaqSection from './components/FaqSection';
 import ContactSection from './components/ContactSection';
+import { trackPageView, trackSession } from './lib/analytics';
 import './App.css';
 
 function App() {
+  useEffect(() => {
+    trackPageView();
+    const start = Date.now();
+    const onUnload = () => {
+      const sec = Math.round((Date.now() - start) / 1000);
+      if (sec >= 3) trackSession(sec);
+    };
+    window.addEventListener('beforeunload', onUnload);
+    return () => window.removeEventListener('beforeunload', onUnload);
+  }, []);
   const navItems = [
-    { name: "메인", link: "#hero" },
-    { name: "1부", link: "#part1" },
-    { name: "2부", link: "#part2" },
-    { name: "후기", link: "#faq" },
-    { name: "리뷰", link: "#reviews" },
+    { name: '소개', link: '#intro' },
+    { name: '컨텐츠', link: '#program' },
+    { name: '후기', link: '#reviews' },
+    { name: '신청', link: '#contact' },
   ];
 
   const logo = <div>Logo</div>;
@@ -23,21 +34,32 @@ function App() {
     <main className="lg:pb-0 pb-24">
       <ResizableNavbar navItems={navItems} logo={logo} />
       <MobileDock />
+
       <section id="hero">
         <HeroSection />
       </section>
-      <div>
+
+      <section id="intro">
+        <IntroSection />
+      </section>
+
+      <section id="program">
         <ProgramSection />
-      </div>
+      </section>
+
       <section id="reviews">
         <ReviewSection />
       </section>
-      <section id="faq">
-        <FaqSection />
-      </section>
+
       <section id="contact">
         <ContactSection />
       </section>
+
+      <section id="faq">
+        <FaqSection />
+      </section>
+
+      
     </main>
   );
 }
