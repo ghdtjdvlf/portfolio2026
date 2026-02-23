@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <script>
+      // GitHub Pages SPA 리다이렉트: 경로를 sessionStorage에 저장 후 index.html로 이동
+      sessionStorage.setItem('redirect', window.location.href);
+      window.location.replace(
+        window.location.protocol + '//' + window.location.hostname +
+        (window.location.port ? ':' + window.location.port : '') +
+        '/portfolio2026/'
+      );
+    </script>
+  </head>
+</html>

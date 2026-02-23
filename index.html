@@ -5,8 +5,20 @@
     <link rel="icon" type="image/svg+xml" href="/portfolio2026/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>myapp</title>
-    <script type="module" crossorigin src="/portfolio2026/assets/index-D8PEU1IT.js"></script>
-    <link rel="stylesheet" crossorigin href="/portfolio2026/assets/index-kSxpAFG4.css">
+    <script>
+      // 404.html에서 넘어온 경로 복원
+      (function() {
+        var redirect = sessionStorage.getItem('redirect');
+        if (redirect) {
+          sessionStorage.removeItem('redirect');
+          var url = new URL(redirect);
+          var path = url.search.slice(1).replace(/&/, '?') || '/';
+          window.history.replaceState(null, null, '/' + path + url.hash);
+        }
+      })();
+    </script>
+    <script type="module" crossorigin src="/portfolio2026/assets/index-B096ny0G.js"></script>
+    <link rel="stylesheet" crossorigin href="/portfolio2026/assets/index-DcknOX8i.css">
   </head>
   <body>
     <div id="root"></div>
