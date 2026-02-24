@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { scrollToSection } from '../lib/lenis';
+import { scrollToSection } from '../lib/scroll';
 
 const STEP_LABELS = [
   '이름', '나이', '성별', '인스타그램', '자기소개',

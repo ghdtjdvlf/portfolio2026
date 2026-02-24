@@ -4,8 +4,9 @@ export default function PartBridge({ id, part, subtitle, subtitleKo, desc, color
   return (
     <motion.div
       id={id}
+      data-program-snap="true"
       className="w-full flex flex-col items-center justify-center py-20 px-6 text-center"
-      style={{ background: '#09090b' }}
+      style={{ background: '#09090b', minHeight: '100vh' }}
       initial={{ opacity: 0, y: 32 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-80px' }}

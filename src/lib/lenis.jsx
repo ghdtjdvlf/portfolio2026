@@ -1,5 +1,9 @@
 import Lenis from 'lenis';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { createContext, useContext, useEffect, useRef } from 'react';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const LenisContext = createContext(null);
 
@@ -32,15 +36,13 @@ export function LenisProvider({ children }) {
     _lenis = lenis;
     ref.current = lenis;
 
-    let rafId;
-    const raf = (time) => {
-      lenis.raf(time);
-      rafId = requestAnimationFrame(raf);
-    };
-    rafId = requestAnimationFrame(raf);
+    // GSAP ticker와 연동 → ScrollTrigger와 동기화
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add((time) => lenis.raf(time * 1000));
+    gsap.ticker.lagSmoothing(0);
 
     return () => {
-      cancelAnimationFrame(rafId);
+      gsap.ticker.remove((time) => lenis.raf(time * 1000));
       lenis.destroy();
       _lenis = null;
       ref.current = null;
@@ -48,6 +50,10 @@ export function LenisProvider({ children }) {
   }, []);
 
   return <LenisContext.Provider value={ref}>{children}</LenisContext.Provider>;
+}
+
+export function getLenis() {
+  return _lenis;
 }
 
 export function useLenis() {

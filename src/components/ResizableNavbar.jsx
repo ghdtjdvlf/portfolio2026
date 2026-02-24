@@ -10,7 +10,7 @@ import {
 } from 'framer-motion';
 import React, { useRef, useState } from 'react';
 
-const Navbar = ({ children, className }) => {
+const Navbar = ({ children, className, show }) => {
   const ref = useRef(null);
   const { scrollY } = useScroll({
     target: ref,
@@ -23,16 +23,25 @@ const Navbar = ({ children, className }) => {
   });
 
   return (
-    <motion.div
-      ref={ref}
-      className={cn('fixed inset-x-0 top-0 z-40 w-full', className)}
-    >
-      {React.Children.map(children, (child) =>
-        React.isValidElement(child)
-          ? React.cloneElement(child, { visible })
-          : child,
+    <AnimatePresence>
+      {show && (
+        <motion.div
+          ref={ref}
+          key="navbar"
+          initial={{ opacity: 0, y: -16 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -16 }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          className={cn('fixed inset-x-0 top-0 z-40 w-full', className)}
+        >
+          {React.Children.map(children, (child) =>
+            React.isValidElement(child)
+              ? React.cloneElement(child, { visible })
+              : child,
+          )}
+        </motion.div>
       )}
-    </motion.div>
+    </AnimatePresence>
   );
 };
 
@@ -154,11 +163,11 @@ const MobileNavMenu = ({ children, className, isOpen }) => {
   );
 };
 
-const ResizableNavbar = ({ navItems, logo }) => {
+const ResizableNavbar = ({ navItems, logo, show }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <Navbar>
+    <Navbar show={show}>
       {/* Desktop */}
       <NavBody>
         <div className="relative z-20 mr-4 flex items-center px-2 py-1">

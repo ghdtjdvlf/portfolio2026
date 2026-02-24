@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import ResizableNavbar from './components/ResizableNavbar';
 import MobileDock from './components/MobileDock';
-import HeroSection from './components/HeroSection';
+import BentoGallery from './components/BentoGallery';
 import IntroSection from './components/IntroSection';
 import ProgramSection from './components/ProgramSection';
 import ReviewSection from './components/ReviewSection';
@@ -12,6 +12,8 @@ import { trackPageView, trackSession, trackVisitor } from './lib/analytics';
 import './App.css';
 
 function App() {
+  const [showNavbar, setShowNavbar] = useState(false);
+
   useEffect(() => {
     trackPageView();
 
@@ -47,12 +49,15 @@ function App() {
 
   return (
     <main className="lg:pb-0 pb-24">
-      <ResizableNavbar navItems={navItems} logo={logo} />
-      <MobileDock />
+      <ResizableNavbar navItems={navItems} logo={logo} show={showNavbar} />
+      <MobileDock show={showNavbar} />
       <ResumeToast />
 
       <section id="hero">
-        <HeroSection />
+        <BentoGallery
+          onLeave={() => setShowNavbar(true)}
+          onEnterBack={() => setShowNavbar(false)}
+        />
       </section>
 
       <section id="intro">
