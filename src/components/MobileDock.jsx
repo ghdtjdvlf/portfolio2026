@@ -1,4 +1,4 @@
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { Sparkles, LayoutGrid, Star, Send } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { scrollToSection } from '../lib/lenis';
@@ -92,7 +92,7 @@ function DockItem({ item, mouseX, isActive }) {
 }
 
 /* ── 메인 Dock ── */
-export default function MobileDock() {
+export default function MobileDock({ show }) {
   const mouseX  = useMotionValue(-Infinity);
   const dockRef = useRef(null);
   const active  = useActiveSection();
@@ -112,28 +112,37 @@ export default function MobileDock() {
 
   return (
     <div className="fixed bottom-0 inset-x-0 z-50 flex justify-center pb-safe lg:hidden">
-      <motion.div
-        ref={dockRef}
-        onMouseMove={(e) => mouseX.set(e.clientX)}
-        onMouseLeave={() => mouseX.set(-Infinity)}
-        className="mb-4 px-4 pt-3 pb-2 rounded-3xl flex items-end gap-3"
-        style={{
-          background: 'rgba(14, 14, 20, 0.78)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
-          border: '1px solid rgba(255,255,255,0.1)',
-          boxShadow: '0 8px 40px rgba(0,0,0,0.5)',
-        }}
-      >
-        {NAV_ITEMS.map((item) => (
-          <DockItem
-            key={item.link}
-            item={item}
-            mouseX={mouseX}
-            isActive={active === item.link.slice(1)}
-          />
-        ))}
-      </motion.div>
+      <AnimatePresence>
+        {show && (
+          <motion.div
+            key="mobile-dock"
+            ref={dockRef}
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 24 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            onMouseMove={(e) => mouseX.set(e.clientX)}
+            onMouseLeave={() => mouseX.set(-Infinity)}
+            className="mb-4 px-4 pt-3 pb-2 rounded-3xl flex items-end gap-3"
+            style={{
+              background: 'rgba(14, 14, 20, 0.78)',
+              backdropFilter: 'blur(24px)',
+              WebkitBackdropFilter: 'blur(24px)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              boxShadow: '0 8px 40px rgba(0,0,0,0.5)',
+            }}
+          >
+            {NAV_ITEMS.map((item) => (
+              <DockItem
+                key={item.link}
+                item={item}
+                mouseX={mouseX}
+                isActive={active === item.link.slice(1)}
+              />
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

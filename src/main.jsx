@@ -8,15 +8,13 @@ import { LenisProvider } from './lib/lenis.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter basename="/portfolio2026">
-      <Routes>
-        <Route path="/admin" element={<AdminPage />} />
-        <Route path="*" element={
-          <LenisProvider>
-            <App />
-          </LenisProvider>
-        } />
-      </Routes>
-    </BrowserRouter>
+    <LenisProvider>
+      <BrowserRouter basename="/portfolio2026">
+        <Routes>
+          <Route path="/admin" element={<AdminPage />} />
+          <Route path="*" element={<App />} />
+        </Routes>
+      </BrowserRouter>
+    </LenisProvider>
   </StrictMode>,
 )
